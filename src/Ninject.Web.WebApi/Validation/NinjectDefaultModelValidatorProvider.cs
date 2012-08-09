@@ -50,11 +50,11 @@ namespace Ninject.Web.WebApi.Validation
         {
             this.kernel = kernel;
             this.defaultModelValidatorProviders = defaultModelValidatorProviders.ToList();
-            DataAnnotationsModelValidatorProvider.RegisterDefaultAdapterFactory(
-                ((metadata, context, attribute) =>
+            new NinjectDataAnnotationsModelValidatorProvider (kernel).RegisterDefaultAdapterFactory(
+                ((validatorProviders, attribute) =>
                     {
                         this.kernel.Inject(attribute);
-                        return (ModelValidator)new DataAnnotationsModelValidator(metadata, context, attribute);
+                        return (ModelValidator)new DataAnnotationsModelValidator(validatorProviders, attribute);
                     }));
         }
 
@@ -64,9 +64,9 @@ namespace Ninject.Web.WebApi.Validation
         /// <param name="metadata">The metadata.</param>
         /// <param name="actionContext">The action context.</param>
         /// <returns>The validators returned by the default validator providers.</returns>
-        public override IEnumerable<ModelValidator> GetValidators(ModelMetadata metadata, HttpActionContext actionContext)
+        public override IEnumerable<ModelValidator> GetValidators(ModelMetadata metadata, IEnumerable<ModelValidatorProvider> validatorProviders)
         {
-            var validators = this.defaultModelValidatorProviders.SelectMany(provider => provider.GetValidators(metadata, actionContext)).ToList();
+            var validators = this.defaultModelValidatorProviders.SelectMany(provider => provider.GetValidators(metadata, validatorProviders)).ToList();
             foreach (var modelValidator in validators)
             {
                 this.kernel.Inject(modelValidator);

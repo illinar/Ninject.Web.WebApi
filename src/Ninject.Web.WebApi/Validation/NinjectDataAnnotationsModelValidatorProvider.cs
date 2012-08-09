@@ -62,9 +62,9 @@ namespace Ninject.Web.WebApi.Validation
         /// <param name="actionContext">The context.</param>
         /// <param name="attributes">The list of validation attributes.</param>
         /// <returns>A list of validators.</returns>
-        protected override IEnumerable<ModelValidator> GetValidators(ModelMetadata metadata, HttpActionContext actionContext, IEnumerable<Attribute> attributes)
+        protected override IEnumerable<ModelValidator> GetValidators(ModelMetadata metadata, IEnumerable<ModelValidatorProvider> validatorProviders, IEnumerable<Attribute> attributes)
         {
-            var validators = base.GetValidators(metadata, actionContext, attributes);
+            var validators = base.GetValidators(metadata, validatorProviders, attributes);
             foreach (var modelValidator in validators.OfType<DataAnnotationsModelValidator>())
             {
                 var attribute = this.getAttributeMethodInfo.Invoke(modelValidator, new object[0]);
